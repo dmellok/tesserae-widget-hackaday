@@ -49,7 +49,7 @@ function heroImgSrc(item) {
 
 export default function render(shadow, ctx) {
   const data = ctx?.data ?? {};
-  const opts = ctx?.options ?? {};
+  const opts = ctx?.cell?.options ?? {};
   const css = `<link rel="stylesheet" href="/static/style/spectra-widgets.css">`;
 
   const headerLabel = data.label || "Hackaday";
