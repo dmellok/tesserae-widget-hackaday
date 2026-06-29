@@ -37,18 +37,14 @@ function fmtAgo(iso) {
   return `${Math.floor(secs / 604800)}w`;
 }
 
-function bytesToImgSrc(url) {
-  // Hackaday's CDN serves through `?w=` resizing; ask for a comfortably
-  // sized version so the renderer doesn't over-dither a 1600px hero
-  // into a 480px cell.
-  if (!url) return "";
-  try {
-    const u = new URL(url);
-    u.searchParams.set("w", "800");
-    return u.toString();
-  } catch {
-    return url;
-  }
+function heroImgSrc(item) {
+  // Prefer the host-side proxy URL the server already built. Falls
+  // back to the upstream URL when the server didn't proxy (legacy
+  // catalog entries, non-hackaday.com hosts), which works on desktop
+  // browsers but can fail under mixed-content / restricted renderer
+  // setups.
+  if (!item) return "";
+  return item.image_proxy || item.image || "";
 }
 
 export default function render(shadow, ctx) {
@@ -94,8 +90,9 @@ export default function render(shadow, ctx) {
   if (layout === "hero") {
     const hero = items[0];
     const rest = items.slice(1);
-    const heroImg = hero.image
-      ? `<div class="hd-hero-img"><img src="${escapeHtml(bytesToImgSrc(hero.image))}" alt="" loading="lazy"></div>`
+    const heroSrc = heroImgSrc(hero);
+    const heroImg = heroSrc
+      ? `<div class="hd-hero-img"><img src="${escapeHtml(heroSrc)}" alt="" loading="eager"></div>`
       : "";
     const heroBlock = `
       <div class="hd-hero">
