@@ -1,10 +1,9 @@
 // news_hackaday — Hackaday's RSS, dressed in the Jolly Wrencher.
 //
-// Three layouts:
-//   sm  — header + most recent headline + relative time
-//   md  — header + list of N headlines with author + time chips
-//   lg  — header + featured hero (image + title + author + time) +
-//         a slim list of the remaining headlines below
+// Two layouts, chosen via the `layout` cell option:
+//   list  — N headlines with author bylines and time-ago chips
+//   hero  — featured image + title + author + time on top,
+//           plus a slim list of the remaining headlines below
 //
 // The Jolly Wrencher is embedded inline so the widget doesn't fetch
 // the brand mark from the upstream site at render time. Black on the
@@ -54,43 +53,12 @@ function bytesToImgSrc(url) {
 
 export default function render(shadow, ctx) {
   const data = ctx?.data ?? {};
-  const size = ctx?.size ?? "md";
   const opts = ctx?.options ?? {};
   const css = `<link rel="stylesheet" href="/static/style/spectra-widgets.css">`;
 
   const headerLabel = data.label || "Hackaday";
-
-  if (data.error) {
-    shadow.innerHTML = `
-      ${css}
-      <div class="w" data-widget="news_hackaday">
-        <div class="w-title">
-          <span class="hd-wrencher" aria-hidden="true">${JOLLY_WRENCHER_SVG}</span>
-          <h3>${escapeHtml(headerLabel)}</h3>
-        </div>
-        <div class="w-body"><p class="u-muted">${escapeHtml(data.error)}</p></div>
-      </div>
-      <style>${layoutCss()}</style>`;
-    return;
-  }
-
-  const items = Array.isArray(data.items) ? data.items : [];
-  if (items.length === 0) {
-    shadow.innerHTML = `
-      ${css}
-      <div class="w" data-widget="news_hackaday">
-        <div class="w-title">
-          <span class="hd-wrencher" aria-hidden="true">${JOLLY_WRENCHER_SVG}</span>
-          <h3>${escapeHtml(headerLabel)}</h3>
-        </div>
-        <div class="w-body"><p class="u-muted">No articles in the feed right now.</p></div>
-      </div>
-      <style>${layoutCss()}</style>`;
-    return;
-  }
-
-  const showImage = opts.show_featured_image !== false;
   const showAuthor = opts.show_author !== false;
+  const layout = opts.layout === "hero" ? "hero" : "list";
 
   const titleBar = `
     <div class="w-title hd-title">
@@ -99,30 +67,34 @@ export default function render(shadow, ctx) {
       <span class="w-title-meta">LATEST</span>
     </div>`;
 
-  // sm layout — most recent headline only.
-  if (size === "sm") {
-    const top = items[0];
+  if (data.error) {
     shadow.innerHTML = `
       ${css}
       <style>${layoutCss()}</style>
       <div class="w" data-widget="news_hackaday">
         ${titleBar}
-        <div class="w-body hd-sm">
-          <p class="hd-sm-title">${escapeHtml(top.title)}</p>
-          <p class="hd-sm-meta">
-            ${showAuthor && top.author ? `<span>${escapeHtml(top.author)}</span><span class="hd-dot">·</span>` : ""}
-            <span>${escapeHtml(fmtAgo(top.published))}</span>
-          </p>
-        </div>
+        <div class="w-body"><p class="u-muted">${escapeHtml(data.error)}</p></div>
       </div>`;
     return;
   }
 
-  // lg layout — hero (image + title + meta) + list of the rest.
-  if (size === "lg") {
+  const items = Array.isArray(data.items) ? data.items : [];
+  if (items.length === 0) {
+    shadow.innerHTML = `
+      ${css}
+      <style>${layoutCss()}</style>
+      <div class="w" data-widget="news_hackaday">
+        ${titleBar}
+        <div class="w-body"><p class="u-muted">No articles in the feed right now.</p></div>
+      </div>`;
+    return;
+  }
+
+  // Hero layout — featured image up top + list of the rest.
+  if (layout === "hero") {
     const hero = items[0];
     const rest = items.slice(1);
-    const heroImg = showImage && hero.image
+    const heroImg = hero.image
       ? `<div class="hd-hero-img"><img src="${escapeHtml(bytesToImgSrc(hero.image))}" alt="" loading="lazy"></div>`
       : "";
     const heroBlock = `
@@ -156,7 +128,7 @@ export default function render(shadow, ctx) {
     return;
   }
 
-  // md layout — list with optional author byline + age.
+  // List layout — N headlines with optional author byline + age.
   const rows = items.map((it, i) => `
     <div class="hd-row ${i % 2 ? "is-zebra" : ""}">
       <span class="hd-bullet" aria-hidden="true"></span>

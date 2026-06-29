@@ -1,9 +1,9 @@
 {
   "tesserae_compat": "1.x",
   "name": "News, Hackaday",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "kind": "widget",
-  "description": "Latest articles from Hackaday, the hardware-hacking publication, with the Jolly Wrencher in the header and per-article featured images on the large layout. Headlines, authors, and time-ago chips for the rest. Pure RSS, no API key.",
+  "description": "Latest articles from Hackaday, the hardware-hacking publication, with the Jolly Wrencher in the header. Pick the hero layout for a featured image up top, or the list layout for a tighter run of headlines. Pure RSS, no API key.",
   "icon": "ph-skull",
   "supports": {
     "sizes": ["sm", "md", "lg"]
@@ -16,18 +16,22 @@
       "default": "Hackaday"
     },
     {
+      "name": "layout",
+      "type": "select",
+      "label": "Layout",
+      "default": "list",
+      "choices": [
+        {"value": "list", "label": "List of headlines"},
+        {"value": "hero", "label": "Hero with featured image"}
+      ]
+    },
+    {
       "name": "max_items",
       "type": "number",
       "label": "Max headlines",
       "default": 5,
       "min": 1,
       "max": 12
-    },
-    {
-      "name": "show_featured_image",
-      "type": "boolean",
-      "label": "Show featured image (lg only)",
-      "default": true
     },
     {
       "name": "show_author",

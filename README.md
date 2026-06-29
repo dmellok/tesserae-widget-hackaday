@@ -4,11 +4,10 @@ Latest articles from [Hackaday](https://hackaday.com) on a Tesserae cell. Three 
 
 ## What it does
 
-Pulls Hackaday's public RSS feed (`https://hackaday.com/feed/`) and renders the latest articles:
+Pulls Hackaday's public RSS feed (`https://hackaday.com/feed/`) and renders the latest articles. Two layouts, picked per-cell:
 
-- **Small**: most recent headline + author + time-ago.
-- **Medium**: list of N recent headlines with author bylines.
-- **Large**: hero card (featured image, title, author, time) plus a slim list of the remaining headlines.
+- **List**: N headlines with author bylines and time-ago chips. The default; reads well at any cell size.
+- **Hero**: featured image up top with title, author, time, plus a slim list of the remaining headlines below. Great for the large cells on a 7.3" PhotoPainter or 13.3" Spectra 6.
 
 Pure RSS. No API key, no account, no upstream login. The feed is cached for 15 minutes server-side so a fast refresh cadence on your panel won't hammer Hackaday.
 
@@ -23,8 +22,8 @@ Or follow the [host docs on installing a community widget](https://dmellok.githu
 | Option | Default | Notes |
 |---|---|---|
 | Title | `Hackaday` | Header label. Override per cell if you want it to read differently. |
+| Layout | `List of headlines` | Switch to `Hero with featured image` for the magazine-style card. |
 | Max headlines | 5 | 1 to 12. |
-| Show featured image (lg only) | `true` | Hero image on the large layout. Disable for a slimmer card. |
 | Show author byline | `true` | Author credit per article. |
 
 ## Why this widget exists
